@@ -1,0 +1,13 @@
+node_modules/
+dist/
+
+.DS_Store
+
+*.log
+
+config.json
+
+index.js
+
+!/**/.gitkeep
+!config.template.json
