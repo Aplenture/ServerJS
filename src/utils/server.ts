@@ -5,6 +5,8 @@ import * as Foundation from "foundationjs";
 import { Command } from "./command";
 import { AccessRepository } from "../repositories/accessRepository";
 import { Access } from "../models/access";
+import { Response } from "./response";
+import { Help } from "../commands/help";
 
 const DEFAULT_HOST = 'localhost';
 const DEFAULT_TIMEOUT = 5000;
@@ -36,6 +38,8 @@ export class Server extends Foundation.Commander {
 
     constructor(public readonly access: AccessRepository) {
         super();
+
+        super.addCommand('help', new Foundation.Singleton(() => new Help({ commands: this.commands })));
     }
 
     public addCommand(command: string, singleton: Foundation.Singleton<Command<any, any>>) {
@@ -166,7 +170,7 @@ export class Server extends Foundation.Commander {
                 args.account = access.account;
             }
 
-            const result = await instance.execute(args);
+            const result: Response = await this.execute(command, args);
 
             responseHeaders[Foundation.ResponseHeader.ContentType] = result.type;
 
