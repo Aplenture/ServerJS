@@ -19,6 +19,7 @@
     },
     "homepage": "https://github.com/Aplenture/ServerJS#readme",
     "dependencies": {
-        "foundationjs": "github:Aplenture/FoundationJS"
+        "foundationjs": "github:Aplenture/FoundationJS",
+        "mariadb": "^3.0.2"
     }
 }
