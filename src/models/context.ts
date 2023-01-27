@@ -1,6 +1,6 @@
-import { Log, Server } from "../utils";
+import { Log, App } from "../utils";
 
 export interface Context {
-    readonly server: Server;
+    readonly server: App;
     readonly log: Log;
 }

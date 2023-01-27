@@ -13,7 +13,7 @@ export interface DatabaseConfig {
 }
 
 export class Database {
-    public readonly onMessage = new Foundation.Event<Database, string>();
+    public static readonly onMessage = new Foundation.Event<Database, string>();
 
     private pool: MySQL.Pool;
 
@@ -99,11 +99,11 @@ export class Database {
                 const executedUpdates = await this.query(`SELECT * FROM \`updates\` WHERE \`path\`=?`, [update]);
 
                 if (executedUpdates.length) {
-                    this.onMessage.emit(this, `skip update '${update}' (already executed)`);
+                    Database.onMessage.emit(this, `skip update '${update}' (already executed)`);
                     continue;
                 }
 
-                this.onMessage.emit(this, `execute update '${update}'`);
+                Database.onMessage.emit(this, `execute update '${update}'`);
 
                 await this.query(query);
                 await this.query(`INSERT INTO \`updates\` (\`path\`) VALUES (?)`, [update]);
@@ -116,7 +116,7 @@ export class Database {
 
         query = Database.escapeQuery(query, values);
 
-        this.onMessage.emit(this, `${this.name}.db << ${query}`);
+        Database.onMessage.emit(this, `${this.name}.db << ${query}`);
 
         const connection = await this.pool.getConnection();
 
@@ -138,7 +138,7 @@ export class Database {
         if (Array.isArray(result))
             result.forEach(entry => Database.decodeEntry(entry));
 
-        this.onMessage.emit(this, `${this.name}.db >> ${query} >> ${Foundation.formatDuration(stopwatch.duration, {
+        Database.onMessage.emit(this, `${this.name}.db >> ${query} >> ${Foundation.formatDuration(stopwatch.duration, {
             seconds: true,
             milliseconds: true
         })}`);
@@ -151,7 +151,7 @@ export class Database {
 
         let index = 0;
 
-        this.onMessage.emit(this, "database << " + query);
+        Database.onMessage.emit(this, "database << " + query);
 
         return new Promise<void>(async (resolve, reject) => {
             const connection = await this.pool.getConnection();

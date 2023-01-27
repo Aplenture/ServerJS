@@ -3,10 +3,10 @@ import * as https from "https";
 import * as http from "http";
 import * as Foundation from "foundationjs";
 import { Command } from "./command";
-import { AccessRepository } from "../repositories/accessRepository";
-import { Access } from "../models/access";
+import { AccessRepository } from "../repositories";
+import { Access } from "../models";
 import { Response } from "./response";
-import { Help } from "../commands/help";
+import { Help } from "../commands";
 
 const DEFAULT_HOST = 'localhost';
 const DEFAULT_TIMEOUT = 5000;
@@ -30,24 +30,15 @@ export interface ServerConfig {
     readonly headers: http.OutgoingHttpHeaders;
 }
 
-export class Server extends Foundation.Commander {
-    public readonly onMessage = new Foundation.Event<Server, string>();
-    public readonly onError = new Foundation.Event<Server, Error>();
+export class App {
+    public static readonly onMessage = new Foundation.Event<App, string>();
+    public static readonly onError = new Foundation.Event<App, Error>();
 
-    private readonly _servers: http.Server[] = [];
+    private readonly commander = new Foundation.Commander();
+    private readonly servers: http.Server[] = [];
 
     constructor(public readonly access: AccessRepository) {
-        super();
-
-        super.addCommand('help', new Foundation.Singleton(() => new Help({ commands: this.commands })));
-    }
-
-    public addCommand(command: string, singleton: Foundation.Singleton<Command<any, any>>) {
-        super.addCommand(command, singleton);
-    }
-
-    public addCommands(commands: NodeJS.ReadOnlyDict<Foundation.Singleton<Command<any, any>>>) {
-        super.addCommands(commands);
+        this.commander.addCommand('help', Help, { commands: this.commander.commands });
     }
 
     public start(...configs: readonly ServerConfig[]) {
@@ -76,16 +67,21 @@ export class Server extends Foundation.Commander {
                 host: config.host || DEFAULT_HOST
             });
 
-            this._servers.push(server);
-            this.onMessage.emit(this, `start ${config.protocol} ${Object.keys(config).map(key => `--${key} ${config[key]}`).join(' ')}`);
+            this.servers.push(server);
+
+            App.onMessage.emit(this, `start ${config.protocol} ${Object.keys(config).map(key => `--${key} ${config[key]}`).join(' ')}`);
         });
     }
 
     public stop() {
-        this._servers.forEach(server => server.close());
-        this._servers.splice(0, this._servers.length);
+        this.servers.forEach(server => server.close());
+        this.servers.splice(0, this.servers.length);
 
-        this.onMessage.emit(this, "stop");
+        App.onMessage.emit(this, "stop");
+    }
+
+    public addCommand<T extends Command<any, any>>(command: string, _constructor: new (...args: any[]) => T, ...args: any[]): void {
+        this.commander.addCommand(command, _constructor, ...args);
     }
 
     private async onRequest(
@@ -141,16 +137,16 @@ export class Server extends Foundation.Commander {
         // for securty reasons
         delete args.account;
 
-        this.onMessage.emit(this, `'${ip}' requested '${request.url}'`);
+        App.onMessage.emit(this, `'${ip}' requested '${request.url}'`);
 
         try {
-            const instance = this.getCommand<Command<any, any>>(command);
+            const instance = this.commander.getCommand<Command<any, any>>(command);
 
             if (!instance)
                 throw new Foundation.BadRequestError(Foundation.ErrorMessage.InvalidRoute);
 
             if (args.timestamp)
-                if (!Server.validateTimestamp(Number(args.timestamp), time, config.timeWindow))
+                if (!App.validateTimestamp(Number(args.timestamp), time, config.timeWindow))
                     throw new Foundation.ForbiddenError(Foundation.ErrorMessage.InvalidTimestamp);
 
             if (instance.isPrivate) {
@@ -159,10 +155,10 @@ export class Server extends Foundation.Commander {
 
                 const access = await this.access.getByAPI(api);
 
-                if (!Server.validateAccess(access, time))
+                if (!App.validateAccess(access, time))
                     throw new Foundation.UnauthorizedError(Foundation.ErrorMessage.InvalidAPIKey);
 
-                if (!Server.validateSignature(signature, query, access.secret))
+                if (!App.validateSignature(signature, query, access.secret))
                     throw new Foundation.UnauthorizedError(Foundation.ErrorMessage.InvalidSignature);
 
                 // set account to command args always
@@ -170,7 +166,7 @@ export class Server extends Foundation.Commander {
                 args.account = access.account;
             }
 
-            const result: Response = await this.execute(command, args);
+            const result: Response = await this.commander.execute(command, args);
 
             responseHeaders[Foundation.ResponseHeader.ContentType] = result.type;
 
@@ -180,7 +176,7 @@ export class Server extends Foundation.Commander {
             response.writeHead(error.code || Foundation.ResponseCode.InternalServerError, responseHeaders);
             response.end(error.code ? error.message : 'something_went_wrong');
 
-            this.onError.emit(this, error);
+            App.onError.emit(this, error);
         }
     }
 
