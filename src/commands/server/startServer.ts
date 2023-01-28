@@ -20,6 +20,7 @@ export class StartServer extends Foundation.Command<Config, Context, any, string
     public async execute(): Promise<string> {
         const server = new App(this.context.repositories.access, this.config);
 
+        server.init();
         server.start(...this.config.servers);
 
         return "server started";
