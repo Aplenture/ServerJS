@@ -36,6 +36,10 @@ export class App {
         this.name = config.name;
     }
 
+    public init() {
+        App.onMessage.emit(this, "init");
+    }
+
     public start(...configs: readonly ServerConfig[]) {
         configs.forEach(config => {
             const isHTTPS = config.protocol == Protocol.HTTPS;
