@@ -27,6 +27,8 @@ export class Help extends Foundation.Command<AppConfig, Context, any, Response> 
             .map(command => `  ${command}${' '.repeat(maxCommandNameLength - command.length)} - ${this.context.commands[command].instance.description}`)
             .join('\n');
 
+        result += '\n';
+
         return new TextResponse(result);
     }
 }
