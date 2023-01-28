@@ -36,12 +36,6 @@ export class App {
         this.name = config.name;
     }
 
-    public init() {
-        process.on('exit', () => App.onMessage.emit(this, "exit"));
-        process.on('uncaughtException', error => App.onError.emit(this, error));
-        process.on('unhandledRejection', reason => App.onError.emit(this, new Error(reason.toString())));
-    }
-
     public start(...configs: readonly ServerConfig[]) {
         configs.forEach(config => {
             const isHTTPS = config.protocol == Protocol.HTTPS;
