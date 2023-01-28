@@ -39,6 +39,8 @@ export class App {
 
     constructor(public readonly access: AccessRepository) {
         this.commander.addCommand('help', Help, { commands: this.commander.commands });
+
+        Foundation.Commander.onMessage.on(message => App.onMessage.emit(this, message), { sender: this.commander });
     }
 
     public start(...configs: readonly ServerConfig[]) {
