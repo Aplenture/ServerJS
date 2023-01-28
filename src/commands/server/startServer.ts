@@ -1,8 +1,9 @@
 import * as Foundation from "foundationjs";
+import { AppConfig, ServerConfig } from "../../models";
 import { AccessRepository } from "../../repositories";
-import { App, ServerConfig } from "../../utils";
+import { App } from "../../utils";
 
-interface Config {
+interface Config extends AppConfig {
     readonly servers: readonly ServerConfig[];
 }
 
@@ -15,7 +16,7 @@ export class StartServer extends Foundation.Command<Config, Context, any, string
     public readonly property = null;
 
     public async execute(): Promise<string> {
-        const server = new App(this.context.access);
+        const server = new App(this.context.access, this.config);
 
         server.init();
         server.start(...this.config.servers);

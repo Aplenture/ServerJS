@@ -1,12 +1,13 @@
 import * as FS from "fs";
-import * as https from "https";
-import * as http from "http";
+import * as hTTPS from "https";
+import * as HTTP from "http";
 import * as Foundation from "foundationjs";
 import { Command } from "./command";
 import { AccessRepository } from "../repositories";
-import { Access } from "../models";
+import { Access, AppConfig, ServerConfig } from "../models";
 import { Response } from "./response";
 import { Help } from "../commands";
+import { Protocol } from "../enums";
 
 const DEFAULT_HOST = 'localhost';
 const DEFAULT_TIMEOUT = 5000;
@@ -14,46 +15,31 @@ const DEFAULT_TIME_WINDOW = 10000;
 const DEFAULT_PORT_HTTP = 80;
 const DEFAULT_PORT_HTTPS = 443;
 
-enum Protocol {
-    HTTP = 'http',
-    HTTPS = 'https'
-}
-
-export interface ServerConfig {
-    readonly protocol: Protocol;
-    readonly key?: string;
-    readonly cert?: string;
-    readonly host?: number;
-    readonly port?: number;
-    readonly timeout?: number;
-    readonly timeWindow?: number;
-    readonly headers: http.OutgoingHttpHeaders;
-}
-
 export class App {
     public static readonly onMessage = new Foundation.Event<App, string>();
     public static readonly onError = new Foundation.Event<App, Error>();
 
     private readonly commander = new Foundation.Commander();
-    private readonly servers: http.Server[] = [];
+    private readonly servers: HTTP.Server[] = [];
 
     public get name(): string { return process.title; }
     public set name(value: string) { process.title = value; }
 
-    constructor(public readonly access: AccessRepository) {
-        this.commander.addCommand('help', Help, { commands: this.commander.commands });
+    constructor(
+        public readonly access: AccessRepository,
+        public readonly config: AppConfig
+    ) {
+        this.commander.addCommand('help', Help, config, { commands: this.commander.commands });
 
         Foundation.Commander.onMessage.on(message => App.onMessage.emit(this, message), { sender: this.commander });
+
+        this.name = config.name;
     }
 
     public init() {
         process.on('exit', () => App.onMessage.emit(this, "exit"));
         process.on('uncaughtException', error => App.onError.emit(this, error));
         process.on('unhandledRejection', reason => App.onError.emit(this, new Error(reason.toString())));
-
-        const app = JSON.parse(FS.readFileSync(`${process.env.PWD}/package.json`).toString());
-
-        this.name = app.name;
     }
 
     public start(...configs: readonly ServerConfig[]) {
@@ -65,12 +51,12 @@ export class App {
 
             config.headers[Foundation.ResponseHeader.AllowHeaders] = Object.values(Foundation.RequestHeader).join(",");
 
-            const server = isHTTPS ? https.createServer({
+            const server = isHTTPS ? hTTPS.createServer({
                 key: FS.readFileSync(config.key),
                 cert: FS.readFileSync(config.cert)
             }, (request, response) => this.onRequest(request, response, Protocol.HTTPS, Object.assign({}, config.headers), allowedOrigins, {
                 timeWindow: config.timeWindow || DEFAULT_TIME_WINDOW
-            })) : http.createServer((request, response) => this.onRequest(request, response, Protocol.HTTP, Object.assign({}, config.headers), allowedOrigins, {
+            })) : HTTP.createServer((request, response) => this.onRequest(request, response, Protocol.HTTP, Object.assign({}, config.headers), allowedOrigins, {
                 timeWindow: config.timeWindow || DEFAULT_TIME_WINDOW
             }));
 
@@ -100,10 +86,10 @@ export class App {
     }
 
     private async onRequest(
-        request: http.IncomingMessage,
-        response: http.ServerResponse,
+        request: HTTP.IncomingMessage,
+        response: HTTP.ServerResponse,
         protocol: Protocol,
-        responseHeaders: http.OutgoingHttpHeaders,
+        responseHeaders: HTTP.OutgoingHttpHeaders,
         allowedOrigins: readonly string[],
         config: { readonly timeWindow: number }
     ) {
