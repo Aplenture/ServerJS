@@ -1,5 +1,6 @@
 import * as Foundation from "foundationjs";
-import { Database, DatabaseConfig } from "../../utils";
+import { DatabaseConfig } from "../../models";
+import { Database } from "../../utils";
 
 interface Config {
     readonly databases: readonly DatabaseConfig[];

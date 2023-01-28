@@ -1,16 +1,10 @@
 import * as MySQL from "mariadb";
 import * as fs from "fs";
 import * as Foundation from "foundationjs";
+import { DatabaseConfig } from "../models";
 
 type Type = string | number
 type Entry = NodeJS.ReadOnlyDict<any>;
-
-export interface DatabaseConfig {
-    readonly host: string;
-    readonly user: string;
-    readonly password: string;
-    readonly database: string;
-}
 
 export class Database {
     public static readonly onMessage = new Foundation.Event<Database, string>();
