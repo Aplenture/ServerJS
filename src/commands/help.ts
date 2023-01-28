@@ -4,12 +4,12 @@ import { TextResponse } from "../responses";
 import { Response } from "../utils";
 
 interface Context {
-    readonly commands: NodeJS.ReadOnlyDict<Foundation.Singleton<Foundation.Command<any, any, any>>>;
+    readonly commands: NodeJS.ReadOnlyDict<Foundation.Singleton<Foundation.Command<any, any, any, any>>>;
 }
 
-export class Help extends Foundation.Command<Context, void, Response> {
+export class Help extends Foundation.Command<void, Context, any, Response> {
     public description = "Returna the API description.";
-    public property: Foundation.Property<void>;
+    public property = null;
 
     public async execute(): Promise<Response> {
         const app = JSON.parse(fs.readFileSync(`${process.env.PWD}/package.json`).toString());

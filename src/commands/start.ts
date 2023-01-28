@@ -1,17 +1,17 @@
 import * as Foundation from "foundationjs";
-import { Context } from "../models/context";
+import { Context } from "../models";
 import { ServerConfig } from "../utils";
 
-interface Args {
-    readonly configs: ReadonlyArray<ServerConfig>;
+interface Config {
+    readonly servers: readonly ServerConfig[];
 }
 
-export class Start extends Foundation.Command<Context, Args, void> {
+export class Start extends Foundation.Command<Config, Context, any, void> {
     public readonly description = "Starts the server";
     public readonly property = null;
 
-    public async execute(args: Args): Promise<void> {
-        this.context.server.start(...args.configs);
+    public async execute(): Promise<void> {
+        this.context.server.start(...this.config.servers);
         this.context.log.write("server started");
     }
 }

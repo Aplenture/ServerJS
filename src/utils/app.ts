@@ -82,7 +82,7 @@ export class App {
         App.onMessage.emit(this, "stop");
     }
 
-    public addCommand<T extends Command<any, any>>(command: string, _constructor: new (...args: any[]) => T, ...args: any[]): void {
+    public addCommand(command: string, _constructor: new (...args: any[]) => Command<any, any, any>, ...args: any[]): void {
         this.commander.addCommand(command, _constructor, ...args);
     }
 
@@ -142,7 +142,7 @@ export class App {
         App.onMessage.emit(this, `'${ip}' requested '${request.url}'`);
 
         try {
-            const instance = this.commander.getCommand<Command<any, any>>(command);
+            const instance = this.commander.getCommand<Command<any, any, any>>(command);
 
             if (!instance)
                 throw new Foundation.BadRequestError(Foundation.ErrorMessage.InvalidRoute);
