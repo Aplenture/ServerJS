@@ -1,5 +1,5 @@
 import * as Foundation from "foundationjs";
-import { Database, DatabaseConfig } from "../utils";
+import { Database, DatabaseConfig } from "../../utils";
 
 interface Config {
     readonly databases: readonly DatabaseConfig[];
@@ -9,7 +9,7 @@ interface Args {
     readonly directory: string;
 }
 
-export class Update extends Foundation.Command<Config, void, Args, string> {
+export class UpdateDatabase extends Foundation.Command<Config, void, Args, string> {
     public readonly description = "Updates the databases.";
     public readonly property = new Foundation.DictionaryProperty<Args>("",
         new Foundation.StringProperty("directory", "Directory of update files.")

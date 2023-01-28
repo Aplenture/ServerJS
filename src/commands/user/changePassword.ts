@@ -1,7 +1,7 @@
 import * as Foundation from "foundationjs";
-import { AccountRepository } from "../repositories";
-import { OKResponse } from "../responses";
-import { Command, Response } from "../utils";
+import { AccountRepository } from "../../repositories";
+import { OKResponse } from "../../responses";
+import { Command, Response } from "../../utils";
 
 interface Args {
     readonly account: number;

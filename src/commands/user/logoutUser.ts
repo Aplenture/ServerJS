@@ -1,7 +1,7 @@
 import * as Foundation from "foundationjs";
-import { AccessRepository } from "../repositories";
-import { OKResponse } from "../responses";
-import { Command, Response } from "../utils";
+import { AccessRepository } from "../../repositories";
+import { OKResponse } from "../../responses";
+import { Command, Response } from "../../utils";
 
 interface Args {
     readonly session: string;
@@ -11,7 +11,7 @@ interface Context {
     readonly access: AccessRepository;
 }
 
-export class Logout extends Command<any, Context, Args> {
+export class LogoutUser extends Command<any, Context, Args> {
     public readonly isPrivate = true;
     public readonly description = "Closes the access."
     public readonly property = new Foundation.DictionaryProperty<Args>("",

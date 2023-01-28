@@ -1,7 +1,7 @@
 import * as Foundation from "foundationjs";
-import { AccessRepository, AccountRepository } from "../repositories";
-import { JSONResponse } from "../responses";
-import { Command, Response } from "../utils";
+import { AccessRepository, AccountRepository } from "../../repositories";
+import { JSONResponse } from "../../responses";
+import { Command, Response } from "../../utils";
 
 const DURATION_DELAY = Foundation.Milliseconds.Second;
 const DURATION_SHORT_ACCESS = Foundation.Milliseconds.Day;
@@ -20,7 +20,7 @@ interface Context {
     readonly accounts: AccountRepository;
 }
 
-export class Login extends Command<void, Context, Args> {
+export class LoginUser extends Command<void, Context, Args> {
     public readonly isPrivate = false;
     public readonly description = "Creates access to account."
     public readonly property = new Foundation.DictionaryProperty<Args>("",

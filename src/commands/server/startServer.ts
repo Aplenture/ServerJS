@@ -1,6 +1,6 @@
 import * as Foundation from "foundationjs";
-import { AccessRepository } from "../repositories";
-import { App, ServerConfig } from "../utils";
+import { AccessRepository } from "../../repositories";
+import { App, ServerConfig } from "../../utils";
 
 interface Config {
     readonly servers: readonly ServerConfig[];
@@ -10,7 +10,7 @@ interface Context {
     readonly access: AccessRepository;
 }
 
-export class Start extends Foundation.Command<Config, Context, any, string> {
+export class StartServer extends Foundation.Command<Config, Context, any, string> {
     public readonly description = "Starts a server";
     public readonly property = null;
 

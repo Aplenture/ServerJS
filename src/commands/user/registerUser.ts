@@ -1,7 +1,7 @@
 import * as Foundation from "foundationjs";
-import { AccessRepository, AccountRepository } from "../repositories";
-import { JSONResponse, OKResponse } from "../responses";
-import { Command, Response } from "../utils";
+import { AccessRepository, AccountRepository } from "../../repositories";
+import { JSONResponse, OKResponse } from "../../responses";
+import { Command, Response } from "../../utils";
 
 const DURATION_EXPIRATION = Foundation.Milliseconds.Hour;
 
@@ -18,7 +18,7 @@ interface Context {
     readonly access: AccessRepository;
 }
 
-export class Register extends Command<void, Context, Args>{
+export class RegisterUser extends Command<void, Context, Args>{
     public readonly isPrivate = false;
     public readonly description = "Creates a new account and optionaly a temporary access.";
     public readonly property = new Foundation.DictionaryProperty<Args>("",

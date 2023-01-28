@@ -1,8 +1,7 @@
 import * as Foundation from "foundationjs";
-import { App, Command, Response } from "../utils";
-import { AccessRepository } from "../repositories";
-import { DictionaryProperty } from "foundationjs";
-import { BoolResponse, OKResponse } from "../responses";
+import { App, Command, Response } from "../../utils";
+import { AccessRepository } from "../../repositories";
+import { BoolResponse, OKResponse } from "../../responses";
 
 interface Args {
     readonly session: string;

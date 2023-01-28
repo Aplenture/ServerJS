@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as Foundation from "foundationjs";
-import { TextResponse } from "../responses";
-import { Response } from "../utils";
+import { TextResponse } from "../../responses";
+import { Response } from "../../utils";
 
 interface Context {
     readonly commands: NodeJS.ReadOnlyDict<Foundation.Singleton<Foundation.Command<any, any, any, any>>>;

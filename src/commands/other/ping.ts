@@ -1,5 +1,5 @@
-import { TextResponse } from "../responses";
-import { Command, Response } from "../utils";
+import { TextResponse } from "../../responses";
+import { Command, Response } from "../../utils";
 
 export class Ping extends Command<any, any, any> {
     public readonly isPrivate = false;
