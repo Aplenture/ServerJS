@@ -10,7 +10,9 @@ interface Args {
 }
 
 interface Context {
-    readonly accounts: AccountRepository;
+    readonly repositories: {
+        readonly accounts: AccountRepository;
+    }
 }
 
 export class ChangePassword extends Command<void, Context, Args> {
@@ -23,12 +25,12 @@ export class ChangePassword extends Command<void, Context, Args> {
     );
 
     public async execute(args: Args): Promise<Response> {
-        const account = await this.context.accounts.getByID(args.account);
+        const account = await this.context.repositories.accounts.getByID(args.account);
 
         if (account.key != args.publickey_old)
             throw new Foundation.ForbiddenError('#_wrong_public_key');
 
-        await this.context.accounts.changePassword(args.account, args.publickey_new);
+        await this.context.repositories.accounts.changePassword(args.account, args.publickey_new);
 
         return new OKResponse();
     }

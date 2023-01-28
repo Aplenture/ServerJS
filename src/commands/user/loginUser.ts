@@ -16,8 +16,10 @@ interface Args {
 }
 
 interface Context {
-    readonly access: AccessRepository;
-    readonly accounts: AccountRepository;
+    readonly repositories: {
+        readonly access: AccessRepository;
+        readonly accounts: AccountRepository;
+    }
 }
 
 export class LoginUser extends Command<void, Context, Args> {
@@ -36,7 +38,7 @@ export class LoginUser extends Command<void, Context, Args> {
         // for brute force protection
         await Foundation.sleep(DURATION_DELAY);
 
-        const account = await this.context.accounts.getByName(args.username);
+        const account = await this.context.repositories.accounts.getByName(args.username);
 
         if (!account)
             throw new Foundation.UnauthorizedError('#_login_invalid');
@@ -52,7 +54,7 @@ export class LoginUser extends Command<void, Context, Args> {
             ? DURATION_LONG_ACCESS
             : DURATION_SHORT_ACCESS;
 
-        const access = await this.context.access.create(account.id, args.label, expirationDuration);
+        const access = await this.context.repositories.access.create(account.id, args.label, expirationDuration);
 
         this.message(`create access '${access.id}' for account '${access.account}'`);
 

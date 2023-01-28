@@ -14,8 +14,10 @@ interface Args {
 }
 
 interface Context {
-    readonly accounts: AccountRepository;
-    readonly access: AccessRepository;
+    readonly repositories: {
+        readonly accounts: AccountRepository;
+        readonly access: AccessRepository;
+    }
 }
 
 export class RegisterUser extends Command<void, Context, Args>{
@@ -33,12 +35,12 @@ export class RegisterUser extends Command<void, Context, Args>{
         const seed = !args.publickey && (args.password || Foundation.randomPassword(6));
         const publicKey = args.publickey || Foundation.EC.secp256k1.createPublicKey(Foundation.EC.createPrivateKey(seed));
 
-        const account = await this.context.accounts.create(args.username, publicKey.toString());
+        const account = await this.context.repositories.accounts.create(args.username, publicKey.toString());
 
         if (!args.access)
             return new OKResponse();
 
-        const access = await this.context.access.create(account.id, args.label, DURATION_EXPIRATION);
+        const access = await this.context.repositories.access.create(account.id, args.label, DURATION_EXPIRATION);
 
         return new JSONResponse(access);
     }

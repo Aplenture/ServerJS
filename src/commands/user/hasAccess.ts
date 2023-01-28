@@ -10,7 +10,9 @@ interface Args {
 }
 
 interface Context {
-    readonly access: AccessRepository;
+    readonly repositories: {
+        readonly access: AccessRepository;
+    }
 }
 
 export class HasAccess extends Command<void, Context, Args> {
@@ -23,7 +25,7 @@ export class HasAccess extends Command<void, Context, Args> {
     );
 
     public async execute(args: Args): Promise<Response> {
-        const access = await this.context.access.getByAPI(args.session);
+        const access = await this.context.repositories.access.getByAPI(args.session);
         const time = Date.now();
 
         if (!App.validateAccess(access, time))
