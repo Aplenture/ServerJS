@@ -67,7 +67,7 @@ export class Database {
         this.pool = null;
     }
 
-    public async update(directory = `${process.env.PWD}/updates/${this.name}`): Promise<void> {
+    public async update(directory: string): Promise<void> {
         await this.query(`CREATE TABLE IF NOT EXISTS \`updates\` (
             \`id\` BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
             \`time\` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

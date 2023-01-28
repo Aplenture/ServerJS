@@ -6,4 +6,8 @@ export class Response {
         public readonly type: ResponseType,
         public readonly code: ResponseCode
     ) { }
+
+    public toString(): string {
+        return `${this.type} ${this.code} ${this.data}`;
+    }
 }
