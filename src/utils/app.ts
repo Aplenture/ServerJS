@@ -22,8 +22,7 @@ export class App {
     private readonly commander = new Foundation.Commander();
     private readonly servers: HTTP.Server[] = [];
 
-    public get name(): string { return process.title; }
-    public set name(value: string) { process.title = value; }
+    public get name(): string { return this.config.name; }
 
     constructor(
         public readonly access: AccessRepository,
@@ -32,8 +31,6 @@ export class App {
         this.commander.addCommand('help', Help, config, { commands: this.commander.commands });
 
         Foundation.Commander.onMessage.on(message => App.onMessage.emit(this, message), { sender: this.commander });
-
-        this.name = config.name;
     }
 
     public init() {
