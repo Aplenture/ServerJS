@@ -1,3 +1,4 @@
+import * as Foundation from "foundationjs";
 import { Access } from "../models/access";
 import { Repository } from "../utils/repository";
 
@@ -34,14 +35,14 @@ export class AccessRepository extends Repository<any> {
         };
     }
 
-    public async create(
-        created: number,
-        account: number,
-        api: string,
-        secret: string,
-        label: string,
-        expiration?: number
-    ): Promise<number> {
+    public async create(account: number, label: string, expirationDuration?: number): Promise<Access> {
+        const api = Foundation.toHex(Foundation.random(32));
+        const secret = Foundation.toHex(Foundation.random(32));
+        const created = Date.now();
+        const expiration = expirationDuration
+            ? created + expirationDuration
+            : undefined;
+
         const keys = ['`created`', '`account`', '`api`', '`secret`', '`label`'];
         const values = ['FROM_UNIXTIME(?)', '?', '?', '?', '?'];
 
@@ -61,7 +62,15 @@ export class AccessRepository extends Repository<any> {
 
         const result = await this.database.query(`INSERT INTO ${this.config.table} (${keys.join(',')}) VALUES (${values.join(',')})`, args);
 
-        return result.insertId;
+        return {
+            id: result.insertId,
+            created,
+            account,
+            api,
+            secret,
+            expiration,
+            label
+        };
     }
 
     public async delete(id: number): Promise<void> {

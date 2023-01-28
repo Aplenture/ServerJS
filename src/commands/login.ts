@@ -48,25 +48,14 @@ export class Login extends Command<void, Context, Args> {
         if (!Foundation.ECDSA.verify(hash, key, sign))
             throw new Foundation.UnauthorizedError('#_login_invalid');
 
-        const session = Foundation.toHex(Foundation.random(32));
-        const secret = Foundation.toHex(Foundation.random(32));
-        const created = Date.now();
+        const expirationDuration = args.keepLogin
+            ? DURATION_LONG_ACCESS
+            : DURATION_SHORT_ACCESS;
 
-        const expiration = args.keepLogin
-            ? created + DURATION_LONG_ACCESS
-            : created + DURATION_SHORT_ACCESS;
+        const access = await this.context.access.create(account.id, args.label, expirationDuration);
 
-        const id = await this.context.access.create(
-            created,
-            account.id,
-            session,
-            secret,
-            args.label,
-            expiration
-        );
+        this.message(`create access '${access.id}' for account '${access.account}'`);
 
-        this.message(`create access '${id}' for account '${account.id}'`);
-
-        return new JSONResponse({ session, secret });
+        return new JSONResponse(access);
     }
 }
