@@ -1,4 +1,4 @@
-export * from "./changePassword";
+export * from "./changeUserPassword";
 export * from "./hasAccess";
 export * from "./loginUser";
 export * from "./logoutUser";

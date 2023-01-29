@@ -15,7 +15,7 @@ interface Context {
     }
 }
 
-export class ChangePassword extends Command<void, Context, Args> {
+export class ChangeUserPassword extends Command<void, Context, Args> {
     public readonly isPrivate = true;
     public readonly description = "Changes the account password."
     public readonly property = new Foundation.DictionaryProperty<Args>("",
